@@ -12,13 +12,18 @@ namespace FileUpload_MVC_ADO.Controllers
 {
     public class EmployeeController : Controller
     {
+        private readonly EmployeeRepository _employeeRepository;
+        public EmployeeController()
+        {
+            _employeeRepository = new EmployeeRepository();
+
+        }
         // GET: Employee
         public ActionResult Index()
         {
             List<Employee> employees = new List<Employee>();
-            EmployeeRepository employeeRepository = new EmployeeRepository();
 
-            employees = employeeRepository.GetEmployees();
+            employees = _employeeRepository.GetEmployees();
             return View(employees);
         }
 
@@ -37,7 +42,6 @@ namespace FileUpload_MVC_ADO.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    EmployeeRepository employeeRepository = new EmployeeRepository();
 
 
                     if (file != null)
@@ -51,7 +55,7 @@ namespace FileUpload_MVC_ADO.Controllers
 
 
 
-                    if (employeeRepository.AddEmployee(employee))
+                    if (_employeeRepository.AddEmployee(employee))
                     {
                         return RedirectToAction("Index");
                     }
@@ -72,9 +76,8 @@ namespace FileUpload_MVC_ADO.Controllers
         public ActionResult Edit(int id)
         {
             Employee employees = new Employee();
-            EmployeeRepository employeeRepository = new EmployeeRepository();
 
-            employees = employeeRepository.GetEmployeesByID(id);
+            employees = _employeeRepository.GetEmployeesByID(id);
             return View(employees);
         }
 
@@ -89,7 +92,7 @@ namespace FileUpload_MVC_ADO.Controllers
                 {
                     if (file != null)
                     {
-                        var employeeInDb = new EmployeeRepository().GetEmployeesByID(id);
+                        var employeeInDb = _employeeRepository.GetEmployeesByID(id);
 
                         if (employeeInDb.ImagePath != null)
                         {
@@ -110,14 +113,13 @@ namespace FileUpload_MVC_ADO.Controllers
                     }
                     else
                     {
-                        var employeeInDb = new EmployeeRepository().GetEmployeesByID(id);
+                        var employeeInDb = _employeeRepository.GetEmployeesByID(id);
                         employee.ImagePath = employeeInDb.ImagePath;
                     }
 
 
-                    EmployeeRepository employeeRepository = new EmployeeRepository();
 
-                    if (employeeRepository.UpdateEmployee(id, employee))
+                    if (_employeeRepository.UpdateEmployee(id, employee))
                     {
                         return RedirectToAction("Index");
                     }
@@ -136,9 +138,7 @@ namespace FileUpload_MVC_ADO.Controllers
         public ActionResult Delete(int id)
         {
             Employee employees = new Employee();
-            EmployeeRepository employeeRepository = new EmployeeRepository();
-
-            employees = employeeRepository.GetEmployeesByID(id);
+            employees = _employeeRepository.GetEmployeesByID(id);
             return View(employees);
         }
 
@@ -149,10 +149,9 @@ namespace FileUpload_MVC_ADO.Controllers
         {
             try
             {
-                EmployeeRepository employeeRepository = new EmployeeRepository();
 
                 var employeeInDb = new EmployeeRepository().GetEmployeesByID(employee.ID);
-                if(employeeInDb.ImagePath != null)
+                if (employeeInDb.ImagePath != null)
                 {
                     string fullPath = Request.MapPath("~" + employeeInDb.ImagePath);
                     if (System.IO.File.Exists(fullPath))
@@ -162,7 +161,7 @@ namespace FileUpload_MVC_ADO.Controllers
                 }
 
 
-                if (employeeRepository.DeleteEmployee(employee.ID))
+                if (_employeeRepository.DeleteEmployee(employee.ID))
                 {
                     return RedirectToAction("Index");
                 }
